@@ -1,10 +1,10 @@
 module Main where
 
-import           Data.List          (intercalate)
 import           System.Environment (getArgs)
 
+-- cat
 main :: IO()
 main = do
   args <- getArgs
-  let output = intercalate " " args
-  putStrLn output
+  let filename = head args
+  putStrLn filename
