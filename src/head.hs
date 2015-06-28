@@ -1,21 +1,21 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 module Main where
 
-import           System.Console.CmdArgs 
+import           System.Console.CmdArgs
 
 -- head
 main :: IO()
 main = do
-  args <- cmdArgs options
-  fileContents <- readFile $ filename args
+  opts <- cmdArgs options
+  fileContents <- readFile $ filename opts
   let fileLines = lines fileContents
-  let headLines = take (lineCount args) fileLines
+  let headLines = take (lineCount opts) fileLines
   putStrLn `mapM_` headLines
 
-data Options = Options {
-  filename :: String,
-  lineCount :: Int
-} deriving (Data, Typeable)
+data Options = Options
+  { filename  :: String
+  , lineCount :: Int
+  } deriving (Data, Typeable)
 
 options :: Options
 options = Options
