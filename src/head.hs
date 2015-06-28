@@ -2,7 +2,6 @@
 module Main where
 
 import           System.Console.CmdArgs 
-import           System.Environment     (getArgs)
 
 -- head
 main :: IO()
