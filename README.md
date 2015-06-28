@@ -16,3 +16,4 @@ should be prepared to introduce haskell to your workplace via dodgy scripts.
   1. [echo.hs](src/echo.hs) 
   2. [cat.hs](src/cat.hs)
   3. [head.hs](src/head.hs) 
+  4. [tee.hs](src/tee.hs) 
