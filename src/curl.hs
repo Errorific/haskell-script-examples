@@ -8,7 +8,7 @@ import qualified Network.Wreq.Session       as WS
 import           System.Console.CmdArgs
 
 -- curl
-main :: IO()
+main :: IO ()
 main = do
   opts <- cmdArgs options
   responses <- WS.withSession $ \sess ->
