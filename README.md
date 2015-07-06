@@ -18,3 +18,5 @@ should be prepared to introduce haskell to your workplace via dodgy scripts.
   3. [head.hs](src/head.hs) 
   4. [tee.hs](src/tee.hs) 
   5. [curl.hs](src/curl.hs) 
+  6. [redditcrawler.hs](src/redditcrawler.hs) 
+
