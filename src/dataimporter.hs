@@ -12,13 +12,15 @@ import           Data.Vector                (Vector)
 import qualified Database.PostgreSQL.Simple as Psql
 import           GHC.Generics
 import           System.Console.CmdArgs
-import           System.Exit (exitSuccess, exitFailure)
+import           System.Exit                (exitFailure, exitSuccess)
+import System.IO (hSetEcho, hFlush, stdout, stdin)
 
 -- data importer
 main :: IO ()
 main = do
   opts <- cmdArgs options
   fileContents <- BSL.readFile $ inputFilename opts
+  dbpass <- getPassword
   let csvContents = Csv.decodeByName fileContents :: Either String (Csv.Header, Vector SaleRecord)
   case csvContents of Left e -> do
                         putStrLn e
@@ -27,6 +29,16 @@ main = do
                         conn <- Psql.connectPostgreSQL ""
                         _ <- insertSaleRecords conn saleRecords
                         exitSuccess
+
+getPassword :: IO String
+getPassword = do
+  _ <- putStr "password: "
+  _ <- hFlush stdout
+  _ <- hSetEcho stdin False
+  dbPass <- getLine
+  _ <- hSetEcho stdin True
+  _ <- putStrLn ""
+  return dbPass
 
 data SaleRecord = SaleRecord
   { item     :: Text
@@ -52,6 +64,10 @@ insertSaleRecord conn sr =
 
 data Options = Options
   { inputFilename :: String
+  , dbHost :: String
+  , dbPort :: Int
+  , dbName :: String
+  , dbUser :: String
   } deriving (Data, Typeable)
 
 options :: Options
@@ -59,6 +75,15 @@ options = Options
   { inputFilename = def
                  &= argPos 0
                  &= typFile
+  , dbHost = def
+          &= help "The hostname of the database"
+  , dbPort = def
+          &= help "The port of the database"
+  , dbName = def
+          &= help "The name of the database"
+  , dbUser = def
+          &= help "The user of the database"
+           
   }
   &= summary "Dirty csv data importer"
   &= program "dataimporter"
