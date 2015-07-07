@@ -14,10 +14,21 @@ should be prepared to introduce haskell to your workplace via dodgy scripts.
 
 # Reading order #
   1. [echo.hs](src/echo.hs) 
+    - basic cli args
+    - basic printing
   2. [cat.hs](src/cat.hs)
+    - reading a file
   3. [head.hs](src/head.hs) 
+    - complex cli args
   4. [tee.hs](src/tee.hs) 
+    - IO handles
+    - writing files
   5. [curl.hs](src/curl.hs) 
+    - making http requests 
   6. [redditcrawler.hs](src/redditcrawler.hs) 
+    - reading json webservices
+    - writing csvs
   7. [dataimporter.hs](src/dataimporter.hs)
+    - reading csvs
+    - running db queries
 
