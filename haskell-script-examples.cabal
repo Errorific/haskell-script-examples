@@ -81,7 +81,7 @@ executable dataimporter
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9
-                     , cmdargs == 0.10.*
+                     , optparse-applicative == 0.11.*
                      , cassava == 0.4.*
                      , bytestring == 0.10.*
                      , text == 1.2.*

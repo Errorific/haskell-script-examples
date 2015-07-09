@@ -1,6 +1,5 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import qualified Data.ByteString.Lazy       as BSL
@@ -11,22 +10,22 @@ import qualified Data.Text                  as T
 import           Data.Vector                (Vector)
 import qualified Database.PostgreSQL.Simple as Psql
 import           GHC.Generics
-import           System.Console.CmdArgs
+import           Options.Applicative
 import           System.Exit                (exitFailure, exitSuccess)
-import System.IO (hSetEcho, hFlush, stdout, stdin)
+import           System.IO                  (hFlush, hSetEcho, stdin, stdout)
 
 -- data importer
 main :: IO ()
 main = do
-  opts <- cmdArgs options
+  opts <- execParser optsParserInfo
+  dbPass <- getPassword
   fileContents <- BSL.readFile $ inputFilename opts
-  dbpass <- getPassword
   let csvContents = Csv.decodeByName fileContents :: Either String (Csv.Header, Vector SaleRecord)
   case csvContents of Left e -> do
                         putStrLn e
                         exitFailure
                       Right (_, saleRecords) -> do
-                        conn <- Psql.connectPostgreSQL ""
+                        conn <- makeConnection opts dbPass
                         _ <- insertSaleRecords conn saleRecords
                         exitSuccess
 
@@ -50,6 +49,14 @@ instance Csv.ToNamedRecord SaleRecord
 instance Csv.FromNamedRecord SaleRecord
 instance Csv.DefaultOrdered SaleRecord
 
+makeConnection :: Options -> String -> IO Psql.Connection
+makeConnection opts pass = Psql.connect $ Psql.ConnectInfo
+  (dbHost opts)
+  (fromIntegral $ dbPort opts)
+  (dbUser opts)
+  pass
+  (dbName opts)
+
 insertSaleRecords :: Psql.Connection -> Vector SaleRecord -> IO (Vector Int64)
 insertSaleRecords conn srs = do
   _ <- Psql.begin conn
@@ -64,26 +71,38 @@ insertSaleRecord conn sr =
 
 data Options = Options
   { inputFilename :: String
-  , dbHost :: String
-  , dbPort :: Int
-  , dbName :: String
-  , dbUser :: String
-  } deriving (Data, Typeable)
+  , dbHost        :: String
+  , dbPort        :: Int
+  , dbName        :: String
+  , dbUser        :: String
+  } deriving (Show)
 
-options :: Options
-options = Options
-  { inputFilename = def
-                 &= argPos 0
-                 &= typFile
-  , dbHost = def
-          &= help "The hostname of the database"
-  , dbPort = def
-          &= help "The port of the database"
-  , dbName = def
-          &= help "The name of the database"
-  , dbUser = def
-          &= help "The user of the database"
-           
-  }
-  &= summary "Dirty csv data importer"
-  &= program "dataimporter"
+optsParser :: Parser Options
+optsParser = Options
+  <$> argument str
+    (  metavar "FILE"
+    <> help "input file"
+    )
+  <*> strOption
+    (  long "dbhost"
+    <> help "The hostname of the database"
+    )
+  <*> option auto
+    (  long "dbport"
+    <> help "The port of the database"
+    )
+  <*> option auto
+    (  long "dbname"
+    <> help "The name of the database"
+    )
+  <*> option auto
+    (  long "dbuser"
+    <> help "The user of the database"
+    )
+
+optsParserInfo :: ParserInfo Options
+optsParserInfo = info (helper <*> optsParser)
+  (  fullDesc
+  <> progDesc "A csv importer"
+  <> header "dataimporter - a csv importer"
+  )
