@@ -1,24 +1,23 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           Control.Lens
+import           Control.Lens         ((^.))
 import           Control.Monad
 import           Data.Aeson
-import qualified Data.ByteString.Lazy       as BSL
-import qualified Data.Csv                   as Csv
-import           Data.Text                  (Text)
+import qualified Data.ByteString.Lazy as BSL
+import qualified Data.Csv             as Csv
+import           Data.Text            (Text)
 import           GHC.Generics
-import qualified Network.Wreq               as W
-import qualified Network.Wreq.Session       as WS
-import           System.Console.CmdArgs
+import qualified Network.Wreq         as W
+import qualified Network.Wreq.Session as WS
+import           Options.Applicative
 
 -- reddit crawler
 main :: IO ()
 main = do
-  opts <- cmdArgs options
+  opts <- execParser optsParserInfo
   r <- WS.withSession getRedditList
   let redditListing = r ^. W.responseBody
   let top10 = map rlidatas . take 10 . Main.children $ datas redditListing
@@ -74,13 +73,19 @@ getRedditList sess = do
 
 data Options = Options
   { outputFilename :: String
-  } deriving (Data, Typeable)
-
-options :: Options
-options = Options
-  { outputFilename = def
-                  &= argPos 0
-                  &= typFile
   }
-  &= summary "worst reddit app ever"
-  &= program "redditcrawler"
+
+optsParser :: Parser Options
+optsParser = Options
+  <$> argument str
+    (  metavar "FILENAME"
+    <> help "File to output to"
+    )
+
+optsParserInfo :: ParserInfo Options
+optsParserInfo = info (helper <*> optsParser)
+  (  fullDesc
+  <> progDesc "The worst reddit client"
+  <> header "redditcrawler - a bad reddit client"
+  )
+
