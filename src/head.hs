@@ -15,7 +15,7 @@ main = do
 data Options = Options
   { filename  :: String
   , lineCount :: Int
-  } deriving (Show)
+  }
 
 optsParser :: Parser Options
 optsParser = Options
