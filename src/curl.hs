@@ -25,10 +25,13 @@ optsParser = Options
   <$> many (
     argument str
       (  metavar "URLS"
-      <> help "Urls to request"))
+      <> help "Urls to request"
+      )
+    )
 
 optsParserInfo :: ParserInfo Options
 optsParserInfo = info (helper <*> optsParser)
   (  fullDesc
   <> progDesc "A bad clone of curl"
-  <> header "curl - a bad clone of the real curl")
+  <> header "curl - a bad clone of the real curl"
+  )

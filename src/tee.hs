@@ -29,9 +29,10 @@ data Options = Options
 
 optsParser :: Parser Options
 optsParser = Options
-  <$> many (argument str
-    (  metavar "FILENAME..."
-    <> help "Output files"))
+  <$> many (
+    argument str
+      (  metavar "FILENAMES"
+      <> help "Output files"))
   <*> switch
     (  long "append"
     <> short 'a'

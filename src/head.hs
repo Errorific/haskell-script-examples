@@ -21,15 +21,18 @@ optsParser :: Parser Options
 optsParser = Options
   <$> argument str
     (  metavar "FILENAME"
-    <> help "Input filename")
+    <> help "Input filename"
+    )
   <*> option auto
     (  short 'n'
     <> metavar "NUM"
     <> help "Number of lines to read"
-    <> value 10)
+    <> value 10
+    )
 
 optsParserInfo :: ParserInfo Options
 optsParserInfo = info (helper <*> optsParser)
   (  fullDesc
   <> progDesc "A bad clone of head"
-  <> header "head - a bad clone of the real head" )
+  <> header "head - a bad clone of the real head"
+  )
