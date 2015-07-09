@@ -88,4 +88,3 @@ optsParserInfo = info (helper <*> optsParser)
   <> progDesc "The worst reddit client"
   <> header "redditcrawler - a bad reddit client"
   )
-
