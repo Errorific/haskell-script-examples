@@ -1,9 +1,9 @@
 module Main where
 
-import           Control.Monad          (liftM)
-import           Data.Foldable          (forM_)
+import           Control.Monad       (liftM)
+import           Data.Foldable       (forM_)
+import           Options.Applicative
 import           System.IO
-import Options.Applicative
 
 -- tee
 main :: IO()
