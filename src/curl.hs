@@ -1,17 +1,16 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 module Main where
 
-import           Control.Lens
+import           Control.Lens               ((^.))
 import           Data.ByteString.Lazy.Char8 (unpack)
 import           Data.Foldable              (forM_)
 import qualified Network.Wreq               as W
 import qualified Network.Wreq.Session       as WS
-import           System.Console.CmdArgs
+import           Options.Applicative
 
 -- curl
 main :: IO ()
 main = do
-  opts <- cmdArgs options
+  opts <- execParser optsParserInfo
   responses <- WS.withSession $ \sess ->
     traverse (WS.get sess) (urls opts)
   let bodies = map (\r -> unpack $ r ^. W.responseBody) responses
@@ -19,13 +18,17 @@ main = do
 
 data Options = Options
   { urls :: [String]
-  } deriving (Data, Typeable)
-
-options :: Options
-options = Options
-  { urls = def
-        &= args
-        &= typ "URLS.."
   }
-  &= summary "A bad clone of curl"
-  &= program "curl"
+
+optsParser :: Parser Options
+optsParser = Options
+  <$> many (
+    argument str
+      (  metavar "URLS"
+      <> help "Urls to request"))
+
+optsParserInfo :: ParserInfo Options
+optsParserInfo = info (helper <*> optsParser)
+  (  fullDesc
+  <> progDesc "A bad clone of curl"
+  <> header "curl - a bad clone of the real curl")
