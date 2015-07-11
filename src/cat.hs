@@ -1,6 +1,6 @@
 module Main where
 
-import           System.Environment (getArgs)
+import System.Environment (getArgs)
 
 -- cat
 main :: IO()
