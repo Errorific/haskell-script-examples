@@ -25,7 +25,7 @@ data Options = Options
   , dbPort        :: Int
   , dbName        :: String
   , dbUser        :: String
-  } deriving (Show)
+  }
 
 -- Parser for cli arguments
 optsParser :: Parser Options
