@@ -4,19 +4,23 @@
 module Main where
 
 import           Control.Lens         ((^.))
-import           Control.Monad
-import           Data.Aeson
+import           Control.Monad        (mzero)
+import           Data.Aeson           (FromJSON, Object, parseJSON, (.:))
+import qualified Data.Aeson           as Aeson
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Csv             as Csv
 import           Data.Text            (Text)
-import           GHC.Generics
+import           GHC.Generics         (Generic)
 import qualified Network.Wreq         as W
 import qualified Network.Wreq.Session as WS
-import           Options.Applicative
+import           Options.Applicative  (Parser, ParserInfo, argument, execParser,
+                                       fullDesc, header, help, helper, info,
+                                       metavar, progDesc, str, (<*>), (<>))
 
 -- reddit crawler
 main :: IO ()
 main = do
+  -- run the options parser over the cli arguments
   opts <- execParser optsParserInfo
   r <- WS.withSession getRedditList
   let redditListing = r ^. W.responseBody
@@ -24,13 +28,15 @@ main = do
   let csvContents = Csv.encodeDefaultOrderedByName top10
   BSL.writeFile (outputFilename opts) csvContents
 
+-- Structures matching the json response from reddit
 data RedditListing = RedditListing
   { kind  :: Text
   , datas :: RedditListingData
   } deriving (Show)
 
+-- instance for Aeson to decode JSON into this data structure
 instance FromJSON RedditListing where
- parseJSON (Object v) =
+ parseJSON (Aeson.Object v) =
     RedditListing <$> v .: "kind"
                   <*> v .: "data"
  parseJSON _ = mzero
@@ -50,7 +56,7 @@ data RedditListingItem = RedditListingItem
   } deriving (Show)
 
 instance FromJSON RedditListingItem where
- parseJSON (Object v) =
+ parseJSON (Aeson.Object v) =
     RedditListingItem <$> v .: "kind"
                       <*> v .: "data"
  parseJSON _ = mzero
@@ -63,18 +69,26 @@ data RedditListingItemData = RedditListingItemData
   } deriving (Show, Generic)
 
 instance FromJSON RedditListingItemData
+
+-- Instances for turning RedditListingItemData data type into csv rows
+-- ToNamedRecord figures out header names from record element names
 instance Csv.ToNamedRecord RedditListingItemData
+-- DefaultOrdered uses the order of elements in the record for the csv
+-- column ordering
 instance Csv.DefaultOrdered RedditListingItemData
 
+-- Make a request of reddit decoding the body to a RedditListing
 getRedditList :: WS.Session -> IO (W.Response RedditListing)
 getRedditList sess = do
   r <- WS.get sess "https://reddit.com/hot.json"
   W.asJSON r
 
+-- structure to hold cli arguments
 data Options = Options
   { outputFilename :: String
   }
 
+-- Parser for cli arguments
 optsParser :: Parser Options
 optsParser = Options
   <$> argument str
@@ -82,6 +96,7 @@ optsParser = Options
     <> help "File to output to"
     )
 
+-- Adding program help text to the parser
 optsParserInfo :: ParserInfo Options
 optsParserInfo = info (helper <*> optsParser)
   (  fullDesc
