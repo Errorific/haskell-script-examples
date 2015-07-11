@@ -1,7 +1,7 @@
 module Main where
 
-import           Data.List          (intercalate)
-import           System.Environment (getArgs)
+import Data.List          (intercalate)
+import System.Environment (getArgs)
 
 -- echo
 main :: IO()
