@@ -22,10 +22,15 @@ main :: IO ()
 main = do
   -- run the options parser over the cli arguments
   opts <- execParser optsParserInfo
+  -- make the call to reddit
   r <- WS.withSession getRedditList
+  -- access the data from reddit
   let redditListing = r ^. W.responseBody
+  -- get the top 10 listings from the data from reddit
   let top10 = map rlidatas . take 10 . Main.children $ datas redditListing
+  -- encode the top 10 listings into a csv format
   let csvContents = Csv.encodeDefaultOrderedByName top10
+  -- write the csv formatted data to our output file
   BSL.writeFile (outputFilename opts) csvContents
 
 -- Structures matching the json response from reddit
