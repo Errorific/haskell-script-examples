@@ -5,11 +5,11 @@ import Data.Foldable       (forM_)
 import Options.Applicative (Parser, ParserInfo, argument, execParser, fullDesc,
                             header, help, helper, info, long, many, metavar,
                             progDesc, short, str, switch, (<*>), (<>))
-import System.IO           (IOMode (AppendMode), IOMode (WriteMode), hClose,
-                            hPutStrLn, openFile, stdout)
+import System.IO           (Handle, IOMode (AppendMode), IOMode (WriteMode),
+                            hClose, hPutStrLn, openFile, stdout)
 
 -- tee
-main :: IO()
+main :: IO ()
 main = do
   -- run the parser over the cli argumentts
   opts <- execParser optsParserInfo
@@ -25,6 +25,7 @@ main = do
   mapM_ hClose outputFileHandles
 
 -- print a line to all file handles
+hsPutStrLn :: [Handle] -> String -> IO ()
 hsPutStrLn handles = forM_ handles . flip hPutStrLn
 
 -- structure to hold cli arguments
