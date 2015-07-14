@@ -3,8 +3,8 @@ module Main where
 import Control.Monad       (liftM)
 import Data.Foldable       (forM_)
 import Options.Applicative (Parser, ParserInfo, argument, execParser, fullDesc,
-                            header, help, helper, info, long, many, metavar,
-                            progDesc, short, str, switch, (<*>), (<>))
+                            header, help, helper, info, long, metavar, progDesc,
+                            short, some, str, switch, (<*>), (<>))
 import System.IO           (Handle, IOMode (AppendMode), IOMode (WriteMode),
                             hClose, hPutStrLn, openFile, stdout)
 
@@ -26,7 +26,7 @@ main = do
 
 -- print a line to all file handles
 hsPutStrLn :: [Handle] -> String -> IO ()
-hsPutStrLn handles = forM_ handles . flip hPutStrLn
+hsPutStrLn handles line = forM_ handles . flip hPutStrLn $ line
 
 -- structure to hold cli arguments
 data Options = Options
@@ -37,7 +37,7 @@ data Options = Options
 -- Parser for cli arguments
 optsParser :: Parser Options
 optsParser = Options
-  <$> many (
+  <$> some (
     argument str
       (  metavar "FILENAMES"
       <> help "Output files"))

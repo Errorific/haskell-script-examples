@@ -34,6 +34,7 @@ optsParser = Options
     )
   <*> option auto
     (  short 'n'
+    <> long "numlines"
     <> metavar "NUM"
     <> help "Number of lines to read"
     <> value 10
