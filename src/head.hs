@@ -2,7 +2,7 @@ module Main where
 
 import Data.Foldable       (forM_)
 import Options.Applicative (Parser, ParserInfo, argument, auto, execParser,
-                            fullDesc, header, help, helper, info, metavar,
+                            fullDesc, header, help, helper, info, long, metavar,
                             option, progDesc, short, str, value, (<$>), (<>))
 
 -- head
