@@ -143,4 +143,7 @@ insertSaleRecord :: Psql.Connection -> SaleRecord -> IO Int64
 insertSaleRecord conn sr =
   -- execute a raw sql statement with a list of parameters
   Psql.execute conn "insert into sales (item, quantity, price) values (?, ?, ?)"
-    [item sr, T.pack . show $ quantity sr, T.pack . show $ price sr]
+    [ item sr
+    , T.pack . show $ quantity sr
+    , T.pack . show $ price sr
+    ]
